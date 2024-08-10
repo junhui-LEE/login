@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -63,7 +64,7 @@ public class HomeController {
 
     }
 
-    @GetMapping("/")
+//    @GetMapping("/")
     public String homeLoginV3(HttpServletRequest request,
                               Model model){
 
@@ -84,5 +85,28 @@ public class HomeController {
         return "loginHome";
 
     }
+
+    @GetMapping("/")
+    public String homeLoginV3Spring(
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+            Model model) {
+
+        // 세션에 회원 데이터가 없으면 home
+        if(loginMember == null){
+            return "home";
+        }
+        /*
+        * loginV3()에서, 검증기도 통과하고 DB에서 꺼낸 객체하고 비밀번호 비교하는 것도 통과하여 로그인에
+        * 성공하면 그때 비로소 request.getSession();해서 세션 만들고 session.setAttribute(); 해서
+        * 세션의 Attribute에 값도 넣는다. 로그인에 실패하면 세션자체를 만들지 않는다. 그래서 @SessionAttribute
+        * 를 통해서 주입받는 loginMember가 당연히 null 이다.
+        * */
+
+        // 세션이 유지되면 로그인으로 이동
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+
 
 }

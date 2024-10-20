@@ -2,16 +2,29 @@ package hello.login;
 
 import hello.login.web.filter.LogFilter;
 import hello.login.web.filter.LoginCheckFilter;
+import hello.login.web.interceptor.LogInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
 
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer{
+    // 스프링 컨테이너에 내가 만든 LogInterceptor 를 빈으로 등록을 하는 것이다.
+    // 스프링이 오버라이딩을 함으로서 빈으로 등록하도록 하는 방법을 지원하는 것이다.
+    @Override
+    public void addInterceptors(InterceptorRegistry registry){
+        // InterceptorRegistry 이라고 스프링이 지원을 해주고 이것은 체인 형식으로 지원된다.
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")    // 전체 경로에 대해서 모두 적용시키려면 /** 로 해줘야 한다. 서블릿 필터와 조금 다르다.
+                .excludePathPatterns("/css/**", "/*.ico", "/error");  // 전체 경로는 다 인터셉터 적용되지"만" 이 경로는 인터셉터 적용시키지 마!!
+    }
 
-    @Bean
+//    @Bean
     public FilterRegistrationBean logFilter(){
         FilterRegistrationBean<Filter>  filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new LogFilter());
@@ -24,7 +37,7 @@ public class WebConfig {
         return filterRegistrationBean;
     }
 
-    @Bean
+//    @Bean
     public FilterRegistrationBean loginCheckFilter(){
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new LoginCheckFilter());

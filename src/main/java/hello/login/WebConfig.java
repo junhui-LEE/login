@@ -3,6 +3,7 @@ package hello.login;
 import hello.login.web.filter.LogFilter;
 import hello.login.web.filter.LoginCheckFilter;
 import hello.login.web.interceptor.LogInterceptor;
+import hello.login.web.interceptor.LoginCheckInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,14 @@ public class WebConfig implements WebMvcConfigurer{
                 .order(1)
                 .addPathPatterns("/**")    // 전체 경로에 대해서 모두 적용시키려면 /** 로 해줘야 한다. 서블릿 필터와 조금 다르다.
                 .excludePathPatterns("/css/**", "/*.ico", "/error");  // 전체 경로는 다 인터셉터 적용되지"만" 이 경로는 인터셉터 적용시키지 마!!
+
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/members/add", "/login", "/logout",
+                        "/css/**", "/*.ico", "/error");
     }
+
 
 //    @Bean
     public FilterRegistrationBean logFilter(){

@@ -1,5 +1,6 @@
 package hello.login;
 
+import hello.login.web.argumentresolver.LoginMemberArgumentResolver;
 import hello.login.web.filter.LogFilter;
 import hello.login.web.filter.LoginCheckFilter;
 import hello.login.web.interceptor.LogInterceptor;
@@ -7,13 +8,22 @@ import hello.login.web.interceptor.LoginCheckInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
+import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers){
+//        우리가 만든 LoginMemberArgumentResolver을 등록하는 것이다.
+        resolvers.add(new LoginMemberArgumentResolver());
+    }
+
     // 스프링 컨테이너에 내가 만든 LogInterceptor 를 빈으로 등록을 하는 것이다.
     // 스프링이 오버라이딩을 함으로서 빈으로 등록하도록 하는 방법을 지원하는 것이다.
     @Override

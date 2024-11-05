@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.*;
 
 @Slf4j
 @Controller
@@ -86,7 +88,9 @@ public class HomeController {
 
     }
 
-    @GetMapping("/")
+
+
+//    @GetMapping("/")
     public String homeLoginV3Spring(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             Model model) {
@@ -107,6 +111,31 @@ public class HomeController {
         return "loginHome";
     }
 
+//    *************************************************************************************************************
+//    우리는 지금 @Login 이라는 애노테이션을 직접 만들고 그 다음에 @Login Member loginMember 이렇게 파라미터를 설정했을때 그냥
+//    로그인 된 사용자가 파라미터 자리(loginMember)에 들어오게 할 것이다. Spring MVC에서
+//    제공하는  ArgumentResolver 이라고 하는 것의 기능(파라미터를 처리해서 핸들러 어뎁터에 주는 기능)을 활용하면 된다. @Login 이라는
+//    애노테이션을 만들고 ArgumentResolver로 하여금 파라미터를 @Login Member loginMember 에 들어가는 파라미터를 처리 하게끔 하면 된다.
+//    -순서
+//        1)@Login 애노테이션 만들기
+//        2) @Login을 처리 할 수 있는 LoginMemberArgumentResolver 만들기
+//        3) ArgumentResolver에 우리가 만든 LoginMemberArgumentResolver 을 등록시키기
+//
+    @GetMapping("/")
+    public String homeLoginV3ArgumentResolver(@Login Member loginMember, Model model){
+//        바로 위의 homeLoginV3Spring()에서는 인자로
+//        @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember 와 같이
+//        세션을 고민하고 그랬는데, 더 편리한 방법으로 @Login 만 있으면 된다. ArgumentResolver가 인증된 멤버만 인자로 넣어준다.
+
+         // 세션에 회원 데이터가 없으면 -> 홈화면을 보여준다.
+         if(loginMember == null){
+             return "home";
+         }
+         // 세션이 유지되면 로그인으로 이동 -> 로그인이 된 사용자가 볼 수 있는 홈화면을 보여준다.
+         model.addAttribute("member", loginMember);
+         return "loginHome";
+    }
+//    *************************************************************************************************************
 
 
 }
